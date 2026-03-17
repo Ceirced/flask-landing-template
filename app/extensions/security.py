@@ -1,0 +1,46 @@
+import os
+
+from flask_security import Security, SQLAlchemyUserDatastore
+
+from app.extensions import db
+from app.extensions.celery import CeleryMailUtil
+from app.extensions.webauthn_util import PasskeyWebauthnUtil
+from app.models import Role, User, WebAuthn
+
+user_datastore = SQLAlchemyUserDatastore(db, User, Role, webauthn_model=WebAuthn)
+security = Security(
+    mail_util_cls=CeleryMailUtil,
+    webauthn_util_cls=PasskeyWebauthnUtil,
+)
+
+
+def init_app(app):
+    app.config.update(
+        SECURITY_TRACKABLE=True,
+        SECURITY_PASSWORD_SALT=os.environ["SECURITY_PASSWORD_SALT"],
+        SECURITY_REGISTERABLE=True,
+        SECURITY_PASSWORD_CONFIRM_REQUIRED=False,
+        SECURITY_USE_REGISTER_V2=True,
+        SECURITY_USERNAME_ENABLE=True,
+        SECURITY_SEND_REGISTER_EMAIL=True,
+        SECURITY_POST_REGISTER_VIEW="security.login",
+        SECURITY_CONFIRMABLE=True,
+        SECURITY_USERNAME_REQUIRED=True,
+        SECURITY_EMAIL_SENDER=f'"{app.config["APP_NAME"]}" <hi@aufsichtsr.at>',
+        SECURITY_RECOVERABLE=True,
+        SECURITY_DEFAULT_REMEMBER_ME=True,
+        SECURITY_CHANGEABLE=True,
+        # Set to True when the app has enough users for security
+        SECURITY_RETURN_GENERIC_RESPONSES=False,
+        SECURITY_CHANGE_EMAIL=True,
+        SECURITY_REQUIRES_CONFIRMATION_ERROR_VIEW="confirm",
+        # WebAuthn / Passkeys
+        SECURITY_WEBAUTHN=True,
+        SECURITY_WAN_ALLOW_AS_FIRST_FACTOR=True,
+        SECURITY_WAN_ALLOW_AS_MULTI_FACTOR=False,
+        SECURITY_WAN_ALLOW_AS_VERIFY=["first"],
+        SECURITY_WAN_RP_NAME=app.config.get("APP_NAME", "Flask App"),
+        SECURITY_WAN_ALLOW_USER_HINTS=True,
+    )
+
+    security.init_app(app, user_datastore)

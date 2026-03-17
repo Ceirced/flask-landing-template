@@ -1,0 +1,17 @@
+services:
+  app:
+    container_name: app-dev
+    volumes:
+      - ./app:/home/app/app
+      - ./migrations:/home/app/migrations
+    environment:
+      - APP_SETTINGS=config.DevelopmentConfig
+      - IN_CONTAINER=true
+  
+  redis:
+    ports:
+      - 6379:6379
+    
+  nginx:
+    ports:
+      - 5010:80

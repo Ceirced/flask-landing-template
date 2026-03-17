@@ -1,0 +1,20 @@
+.env
+node_modules
+backups/
+
+__pycache__/
+.vscode/
+env
+
+logs/
+backup.sh
+.venv/
+
+.mypy_cache/
+.DS_Store
+instance/
+
+# Generated CSS files
+app/static/css/build/
+
+compose.override.yml

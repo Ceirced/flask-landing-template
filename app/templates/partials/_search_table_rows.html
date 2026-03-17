@@ -1,0 +1,13 @@
+{% for row in search_results %}
+    <tr class="border-b transition-all last:border-none">
+        <td class="p-2">
+            <div class="flex flex-row justify-between">
+                <a
+                    class="block underline"
+                    href="{{ row.url }}">
+                    {{ row.handle }}
+                </a>
+            </div>
+        </td>
+    </tr>
+{% endfor %}

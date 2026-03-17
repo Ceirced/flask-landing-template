@@ -1,0 +1,114 @@
+[project]
+name = "flask-app"
+version = "0.1.0"
+description = ""
+readme = "README.md"
+authors = [{ name = "Cederic Demoulin", email = "cdemoulin@protonmail.com" }]
+requires-python = ">=3.13"
+dependencies = [
+    "sqlalchemy>=2.0.35",
+    "flask>=3.0.3",
+    "flask-sqlalchemy>=3.1.1",
+    "flask-migrate>=4.1.0",
+    "flask-login>=0.6.3",
+    "posthog>=3.6.6",
+    "stripe>=11.0.0",
+    "python-dotenv>=1.0.1",
+    "pymysql>=1.1.1",
+    "flask-wtf>=1.2.1",
+    "bleach>=6.1.0",
+    "email-validator>=2.2.0",
+    "gunicorn>=23.0.0",
+    "flask-security[common,fsqla,mfa]>=5.7.1",
+    "setuptools>=78.1.0",
+    "celery>=5.5.3",
+    "redis>=6.2.0",
+    "flask-admin[sqlalchemy]>=2.0.0a4",
+    "flask-htmx>=0.4.0",
+    "flask-caching>=2.3.1",
+    "loguru>=0.7.3",
+    "celery-types>=0.23.0",
+    "flask-moment>=1.0.6",
+    "flask-mailman>=1.1.1",
+]
+
+[dependency-groups]
+dev = [
+    "ruff",
+    "black",
+    "mypy>=1.11.2",
+    "types-flask>=1.1.6",
+    "pre-commit>=4.3.0",
+    "isort>=6.0.1",
+    "pytest>=8.4.1",
+]
+
+[tool.mypy]
+exclude = ["migrations/"]
+
+# Packages without type stubs
+[[tool.mypy.overrides]]
+module = [
+    "flask_security.*",
+    "flask_wtf.*",
+    "flask_mailman.*",
+    "flask_admin.*",
+    "flask_htmx.*",
+    "flask_migrate.*",
+    "flask_moment.*",
+    "flask_login.*",
+]
+ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py312"
+exclude = ["migrations"]
+
+[tool.ruff.lint]
+select = [
+  # see https://docs.astral.sh/ruff/rules/ for details
+  "A", # flake8-builtins
+  "ASYNC", # flake8-async
+  "B", # flake8-bugbear
+  "C4", # flake8-comprehensions
+  "DJ", # flake8-django
+  "E", # pycodestyle
+  "F", # Pyflakes
+  "FURB", # refurb
+  "I", # isort
+  "LOG", # flake8-logging
+  "N", # pep8-naming
+  "PERF", # Perflint
+  "PTH", # flake8-use-pathlib
+  "RSE", # flake8-raise
+  "RUF", # Ruff-specific rules
+  "S", # flake8-bandit
+  "SIM", # flake8-simplify
+  "T20", # flake8-print
+  "UP", # pyupgrade
+  "W", # pycodestyle
+]
+ignore = [
+  "RUF010", # explicit-f-string-type-conversion
+  "RUF012", # mutable-class-default
+  "SIM105", # suppressible-exception
+]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+known-first-party = ["app"]
+section-order = [
+  "future",
+  "standard-library",
+  "third-party",
+  "first-party",
+  "local-folder",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests*.py" = [
+  "S101", # allow asserts in tests
+]
+
+[tool.ruff.format]
+quote-style = "double"

@@ -1,0 +1,36 @@
+{# djlint:off H030,H031 #}
+{% extends "base_base.html" %}
+{%- block head -%}
+    {%- block head_scripts -%}
+    {%- endblock head_scripts -%}
+{%- endblock head -%}
+{%- block body -%}
+    <body>
+        {% block navbar %}
+        {%- endblock navbar -%}
+        <div class="mx-auto mt-4 w-sm opacity-50">
+            <button
+                onclick="history.back()"
+                class="btn btn-ghost btn-sm gap-1">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="size-4">
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                </svg>
+                Back
+            </button>
+        </div>
+        {%- block content -%}
+        {%- endblock content -%}
+        {% include 'partials/_flash-messages.html' %}
+        {% block scripts %}
+        {%- endblock scripts -%}
+    </body>
+{%- endblock body -%}

@@ -1,0 +1,87 @@
+networks:
+  app_network:
+  default:
+    external: true
+    name: proxy
+
+
+name: template-app
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: flask-app
+    entrypoint: [ './boot.sh' ]
+    stop_signal: SIGINT
+    # to sync the ./api dir with the container only for development
+    volumes:
+      - ./logs/app:/home/app/logs
+      - ./migrations:/home/app/migrations
+      - ./instance:/home/app/instance
+    env_file:
+      - .env
+    environment:
+      - APP_SETTINGS=config.ProductionConfig
+    healthcheck:
+      test: curl --fail http://localhost:5000 -H 'Host:localhost' || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+    networks:
+      app_network:
+        aliases:
+          - app
+    restart: unless-stopped
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: flask-app
+    command: uv run celery -A app.make_celery worker --loglevel INFO -E
+    
+    stop_signal: SIGINT
+    volumes:
+      - ./logs/app:/home/app/logs
+      - ./migrations:/home/app/migrations
+      - ./instance:/home/app/instance
+    env_file:
+      - .env
+    environment:
+      - APP_SETTINGS=config.ProductionConfig
+    networks:
+      app_network:
+        aliases:
+          - celery
+    restart: unless-stopped
+
+  nginx:
+    build: nginx
+    depends_on:
+      - app
+    volumes:
+      - ./app/static:/static:ro
+    networks:
+      app_network:
+        aliases:
+          - nginx
+      default:
+    restart: unless-stopped
+  
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: redis-cli ping || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      app_network:
+        aliases:
+          - redis
+          

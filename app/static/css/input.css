@@ -1,0 +1,106 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@plugin "daisyui/theme" {
+    name: "dark";
+    default: true;
+    prefersdark: true;
+    color-scheme: "dark";
+    --color-base-100: oklch(20.84% 0.008 17.911);
+    --color-base-200: oklch(18.522% 0.007 17.911);
+    --color-base-300: oklch(16.203% 0.007 17.911);
+    --color-base-content: oklch(83.768% 0.001 17.911);
+    --color-primary: oklch(68.628% 0.185 148.958);
+    --color-primary-content: oklch(0% 0 0);
+    --color-secondary: oklch(43% 0.078 188.216);
+    --color-secondary-content: oklch(98% 0.014 180.72);
+    --color-accent: oklch(70.628% 0.119 185.713);
+    --color-accent-content: oklch(14.125% 0.023 185.713);
+    --color-neutral: oklch(30.698% 0.039 171.364);
+    --color-neutral-content: oklch(86.139% 0.007 171.364);
+    --color-info: oklch(72.06% 0.191 231.6);
+    --color-info-content: oklch(0% 0 0);
+    --color-success: oklch(64.8% 0.15 160);
+    --color-success-content: oklch(0% 0 0);
+    --color-warning: oklch(84.71% 0.199 83.87);
+    --color-warning-content: oklch(0% 0 0);
+    --color-error: oklch(71.76% 0.221 22.18);
+    --color-error-content: oklch(0% 0 0);
+    --radius-selector: 1rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+    name: "light";
+    default: true;
+    prefersdark: false;
+    color-scheme: "light";
+    --color-base-100: oklch(100% 0 0);
+    --color-base-200: oklch(98% 0.001 106.423);
+    --color-base-300: oklch(92% 0.006 264.531);
+    --color-base-content: oklch(32.44% 0.023 264.18);
+    --color-primary: oklch(68.88% 0.187 148.92);
+    --color-primary-content: oklch(100% 0 0);
+    --color-secondary: oklch(43% 0.078 188.216);
+    --color-secondary-content: oklch(98% 0.014 180.72);
+    --color-accent: oklch(79% 0.184 86.047);
+    --color-accent-content: oklch(98% 0.026 102.212);
+    --color-neutral: oklch(37% 0.01 67.558);
+    --color-neutral-content: oklch(98% 0 0);
+    --color-info: oklch(58% 0.158 241.966);
+    --color-info-content: oklch(90% 0.058 230.902);
+    --color-success: oklch(64% 0.2 131.684);
+    --color-success-content: oklch(96% 0.067 122.328);
+    --color-warning: oklch(76% 0.188 70.08);
+    --color-warning-content: oklch(96% 0.059 95.617);
+    --color-error: oklch(57% 0.245 27.325);
+    --color-error-content: oklch(88% 0.062 18.334);
+    --radius-selector: 1rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1.5px;
+    --depth: 0;
+    --noise: 0;
+}
+
+@theme {
+    --font-sans:
+        Inter var, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+        "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
+}
+
+@utility tile {
+    @apply rounded-lg bg-white p-2 md:p-5 dark:bg-zinc-900;
+}
+
+@utility quote {
+    @apply rounded-md bg-slate-900 p-4 text-gray-400 shadow-md;
+}

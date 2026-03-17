@@ -1,0 +1,33 @@
+#!/bin/bash
+# this script is used to boot a Docker container
+
+# Function to start the Flask server
+start_server() {
+    if [ "$APP_SETTINGS" = "config.ProductionConfig" ]; then
+        WORKERS=${GUNICORN_WORKERS:-2}
+        echo "Starting Flask server in production with $WORKERS workers..."
+        exec uv run gunicorn --bind :5000 --access-logfile - --error-logfile - flask_app:app --workers $WORKERS
+    else
+        echo "Starting Flask server in dev..."
+        uv run python flask_app.py
+    fi
+}
+
+# Check if APP_SETTINGS is set
+if [ -z "$APP_SETTINGS" ]; then
+    echo "Error: APP_SETTINGS variable is not set."
+    exit 1
+fi
+
+while true; do
+    uv run flask db upgrade
+    if [[ "$?" == "0" ]]; then
+        break
+    fi
+    echo Deploy command failed, retrying in 5 secs...
+    sleep 5
+done
+
+
+# Start the server
+start_server
