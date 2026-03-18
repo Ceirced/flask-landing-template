@@ -12,14 +12,12 @@ dependencies = [
     "flask-migrate>=4.1.0",
     "flask-login>=0.6.3",
     "posthog>=3.6.6",
-    "stripe>=11.0.0",
     "python-dotenv>=1.0.1",
     "pymysql>=1.1.1",
     "flask-wtf>=1.2.1",
     "bleach>=6.1.0",
     "email-validator>=2.2.0",
     "gunicorn>=23.0.0",
-    "flask-security[common,fsqla,mfa]>=5.7.1",
     "setuptools>=78.1.0",
     "celery>=5.5.3",
     "redis>=6.2.0",
@@ -49,7 +47,6 @@ exclude = ["migrations/"]
 # Packages without type stubs
 [[tool.mypy.overrides]]
 module = [
-    "flask_security.*",
     "flask_wtf.*",
     "flask_mailman.*",
     "flask_admin.*",

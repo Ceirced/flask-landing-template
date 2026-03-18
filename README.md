@@ -1,178 +1,159 @@
-# Flask Web App with HTMX
+# Flask Landing Page Template
 
-A modern Flask web application template designed for building web applications with HTMX. It focuses on server-side rendering, minimal JavaScript, and a clean, responsive UI using TailwindCSS.
+A minimal, production-ready Flask template for **lead generation landing pages** with a multi-step HTMX funnel, UTM tracking, A/B variant testing, and an admin dashboard.
 
-## Tech Stack
+Built on top of [flask-app](https://github.com/Ceirced/flask-app) — stripped of auth, focused on conversion.
 
-### Backend
+## Features
 
-- **Framework**: Flask 3.x with Flask-Security for authentication
-- **Task Queue**: Celery with Redis
-- **Database**: SQLAlchemy with Flask-Migrate
-- **Python Version**: ^3.12
+- **HTMX multi-step funnel** — 3 configurable question steps → contact capture → thank you, all without page reloads
+- **Lead model** — stores email, phone, funnel answers, UTM params, A/B variant, IP address
+- **UTM tracking** — auto-captures `utm_source`, `utm_medium`, `utm_campaign`, `utm_content` from URL and persists them through the funnel
+- **A/B variant routing** — serve different headlines/CTAs via `AB_VARIANT=a|b` env var; tracked per lead + PostHog
+- **Admin lead dashboard** — Flask-Admin at `/admin` with search, filters by source/campaign/variant, and CSV export
+- **Async confirmation email** — sends via Celery + Redis using flask-mailman
+- **Production-ready** — Docker, nginx, gunicorn, PostgreSQL, TailwindCSS v4 + DaisyUI
 
-### Frontend
+## Stack
 
-- **Approach**: Server-side rendering with HTMX (NO JavaScript business logic)
-- **CSS Framework**: TailwindCSS v4 with DaisyUI components
-- **Build Tool**: NPM scripts for Tailwind compilation
+- Python / Flask
+- HTMX + Alpine.js
+- TailwindCSS v4 + DaisyUI
+- PostgreSQL + SQLAlchemy + Flask-Migrate
+- Celery + Redis (email queue)
+- Flask-Admin (lead dashboard)
+- PostHog (analytics)
+- Docker + nginx
 
-## Setup Instructions
+## Quick Start
 
-### Prerequisites
-
-- Python 3.12+
-- Node.js and npm
-- Docker and Docker Compose
-- Poetry (for Python dependency management)
-
-### Initial Setup
-
-1. **Clone the repository and install dependencies:**
-
-    ```bash
-    npm install          # Install Tailwind CSS dependencies
-    poetry install       # Install Python dependencies
-    ```
-
-2. **Configure environment variables:**
-
-    ```bash
-    cp .env.example .env
-    # Edit .env and fill in your configuration
-    ```
-
-3. **Required environment variables:**
-    - `SECRET_KEY` - Generate a secure random key
-    - `SECURITY_PASSWORD_SALT` - Generate a random salt for password hashing (REQUIRED - app will fail without it)
-    - `SQLALCHEMY_DATABASE_URI` - Database connection string
-    - `APP_SETTINGS` - Configuration class (e.g., `config.DevelopmentConfig`)
-    - See `.env.example` for all available options
-
-4. **Set up the database:**
-    ```bash
-    flask db upgrade
-    ```
-
-## Running the Application
-
-### Development Mode
-
-**Option 1: Local development (recommended)**
+### 1. Clone and install
 
 ```bash
-make local      # Start only Redis and Celery in Docker
-flask run       # Run Flask app locally
-npm run dev     # In another terminal, watch and compile Tailwind CSS
+git clone https://github.com/Ceirced/flask-landing-template.git my-campaign
+cd my-campaign
+uv sync
 ```
 
-**Option 2: Full Docker development**
+### 2. Configure environment
+
+Copy `.env.example` to `.env` and fill in your values:
 
 ```bash
-make dev        # Run everything in Docker containers
+APP_SETTINGS=config.ProductionConfig
+SECRET_KEY=your-secret-key
+APP_NAME=Your Campaign Name
+
+# Database
+SQLALCHEMY_DATABASE_URI=postgresql://user:pass@localhost/dbname
+
+# Redis (for Celery)
+REDIS_URL=redis://localhost:6379/0
+
+# Mail
+MAIL_SERVER=smtp.your-provider.com
+MAIL_PORT=587
+MAIL_USERNAME=your@email.com
+MAIL_PASSWORD=your-password
+MAIL_DEFAULT_SENDER=noreply@yourdomain.com
+
+# Campaign
+LEAD_EMAIL_SUBJECT=Thanks for your interest!
+AB_VARIANT=a          # "a" or "b" — controls landing page headline variant
+POSTHOG_API_KEY=      # optional
 ```
 
-### Production Mode
+### 3. Run migrations
 
 ```bash
-make prod       # Run in production mode with Docker
+flask --app flask_app db upgrade
 ```
 
-### Stop Services
+### 4. Start
+
+**Development:**
+```bash
+flask --app flask_app run --debug
+```
+
+**Production (Docker):**
+```bash
+docker compose up -d
+```
+
+### 5. Build CSS
 
 ```bash
-make stop       # Stop all containers
-make clean      # Stop containers and remove volumes
+npm install
+npm run build  # or: npm run dev (watch mode)
 ```
+
+## Customization
+
+### Funnel questions
+
+Edit `app/templates/public/funnel/step_1.html`, `step_2.html`, `step_3.html`.
+
+Each step is a plain HTML partial loaded via HTMX — just change the question text and radio options. The step number, progress bar, and HTMX routing are already wired up.
+
+### Landing page copy
+
+Edit `app/templates/public/index.html`.
+
+Variant A and B headlines are in the `{% if variant == "a" %}` block. Switch variants via `AB_VARIANT` env var.
+
+### Confirmation email
+
+Edit `app/templates/emails/lead_confirmation.html`. The funnel answers are available as `{{ funnel_data }}`.
+
+### Email subject
+
+Set `LEAD_EMAIL_SUBJECT` in your environment or update the default in `config.py`.
+
+## Admin Dashboard
+
+Available at `/admin` — shows all leads with:
+- Filter by UTM source, campaign, A/B variant, funnel step reached
+- Search by email
+- Bulk CSV export (select leads → Actions → Export CSV)
+
+> **Note:** The admin is open by default. Add auth before going to production (Flask-BasicAuth or Flask-Login).
+
+## A/B Testing
+
+Set `AB_VARIANT=a` or `AB_VARIANT=b` on your server. The variant is stored with each lead, so you can compare conversion rates between variants in the admin or your analytics tool.
+
+Use PostHog to track events and measure variant performance — the PostHog snippet is already included in `base_base.html`.
+
+## UTM Tracking
+
+Any UTM params passed in the URL (`?utm_source=instagram&utm_campaign=spring`) are:
+1. Stored in the user's session on first visit
+2. Persisted through all funnel steps
+3. Saved to the `Lead` record on submission
+
+This lets you attribute leads back to specific ads or channels.
 
 ## Project Structure
 
 ```
 app/
-├── main/
-│   ├── first/        # Primary features
-│   ├── second_page/  # Secondary features
-│   └── users/        # User profiles and settings
-├── templates/        # Jinja2 templates with HTMX
-├── static/          # CSS, images, etc.
-├── models.py        # SQLAlchemy models
-└── extensions/      # Flask extensions setup
-tests/              # Pytest test suite
-migrations/         # Database migrations (Flask-Migrate)
-config.py           # App configuration
-flask_app.py        # Application entry point
+├── models.py              # Lead model
+├── tasks.py               # Celery task: send confirmation email
+├── admin_views.py         # Flask-Admin: LeadAdmin with CSV export
+├── public/
+│   └── routes.py          # Landing page + funnel routes
+├── templates/
+│   ├── public/
+│   │   ├── index.html     # Landing page (A/B variants)
+│   │   └── funnel/
+│   │       ├── step_1.html     # Question 1
+│   │       ├── step_2.html     # Question 2
+│   │       ├── step_3.html     # Question 3
+│   │       ├── step_contact.html  # Email + phone capture
+│   │       └── thank_you.html     # Success screen
+│   └── emails/
+│       └── lead_confirmation.html  # Confirmation email
+└── extensions/
+    └── celery.py          # Celery factory
 ```
-
-## Development Commands
-
-### Backend
-
-```bash
-ruff check .                     # Lint Python code
-black .                          # Format Python code
-mypy .                           # Type check
-
-# Database
-flask db migrate -m "message"    # Create new migration
-flask db upgrade                 # Apply migrations
-
-# Testing
-pytest                           # Run test suite
-```
-
-### Frontend
-
-```bash
-npm run dev                      # Watch and compile Tailwind CSS
-npm run build                    # Build minified CSS for production
-```
-
-## Docker Configuration
-
-Before running in Docker:
-
-- [ ] Rename the project in `docker-compose.yml` at the `name` property
-- [ ] Configure PostHog analytics key or remove from compose
-- [ ] Configure Stripe payment key or remove from compose
-- [ ] Review nginx configuration if using reverse proxy
-
-Create a `compose.override.yml` for local development overrides (e.g., mounting source code, exposing ports).
-
-```
-cp compose.override.dev.yml compose.override.yml
-```
-
-## Environment Variables
-
-Copy `.env.example` to `.env` and configure. Key variables include:
-
-- **Flask & Security**: `SECRET_KEY`, `SECURITY_PASSWORD_SALT` (required)
-- **Database**: `SQLALCHEMY_DATABASE_URI`
-- **Mail**: SMTP configuration for email features
-- **Optional**: Stripe, PostHog, maintenance mode settings
-
-See `.env.example` for complete list with descriptions.
-
-## Security Considerations
-
-- Flask-Security handles authentication and authorization
-- CSRF protection enabled via Flask-WTF
-- Secure session cookies in production
-- Password salt must be configured (app will fail without it)
-
-## HTMX Patterns
-
-The application uses HTMX for dynamic updates:
-
-- **Boosted Navigation**: SPA-like navigation with `hx-boost`
-- **Partial Updates**: Forms return partial HTML templates
-- **Error Handling**: Appropriate HTTP status codes with error partials
-
-## Contributing
-
-1. Follow existing code conventions
-2. Use Ruff
-3. Write tests for new features
-4. Update documentation as needed
-
-## License

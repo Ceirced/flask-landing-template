@@ -1,0 +1,28 @@
+<div id="funnel-container" class="card bg-base-100 shadow-xl max-w-lg mx-auto mt-16 p-8">
+  <div class="mb-6">
+    <div class="flex justify-between text-sm text-base-content/50 mb-2">
+      <span>Step 2 of 3</span><span>66%</span>
+    </div>
+    <progress class="progress progress-primary w-full" value="66" max="100"></progress>
+  </div>
+
+  <h2 class="text-2xl font-bold mb-2">Quick question 2 of 3</h2>
+  {# TODO: Customize this question for your campaign #}
+  <p class="text-base-content/70 mb-6">How would you rate your current costs?</p>
+
+  <form hx-post="/funnel/step/2" hx-target="#funnel-container" hx-swap="outerHTML">
+    <div class="space-y-3">
+      {% for option in [
+        "Too high — I'm definitely paying too much",
+        "Average — about what others pay",
+        "Good — I already have a decent deal"
+      ] %}
+      <label class="flex items-center gap-3 p-4 border border-base-300 rounded-lg cursor-pointer hover:bg-base-200 has-[:checked]:border-primary has-[:checked]:bg-primary/10 transition-colors">
+        <input type="radio" name="q2" value="{{ option }}" class="radio radio-primary" required>
+        <span>{{ option }}</span>
+      </label>
+      {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-primary w-full mt-6">Next →</button>
+  </form>
+</div>

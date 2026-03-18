@@ -1,45 +1,62 @@
 {% extends 'base_base.html' %}
 {% block body %}
-    <body class="container mx-auto pt-[env(safe-area-inset-top)] font-sans">
-        <header class="flex justify-end p-4">
-            <div class="flex items-center">
-                <a
-                    hx-boost="true"
-                    href="{{ url_for('security.login') }}"
-                    class="text-primary btn btn-ghost text-lg font-medium"
-                    >Login
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="inline-block size-6">
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25" />
-                    </svg>
-                </a>
-                {% include 'components/theme_toggle_inline.html' %}
-            </div>
-        </header>
-        <main class="mt-16 flex flex-col gap-40">
-            <hgroup class="m-4 flex flex-col items-center gap-8 text-center">
-                <h2
-                    class="bg-linear-to-b from-zinc-400 to-zinc-500 bg-clip-text text-2xl font-medium text-transparent sm:text-3xl">
-                    {{ config['APP_NAME'] }}
-                </h2>
-                <h1
-                    class="bg-linear-to-b from-zinc-400 to-zinc-500 bg-clip-text text-4xl leading-normal font-semibold text-transparent sm:text-5xl sm:leading-normal">
-                    dream big, start small
-                </h1>
-                <a
-                    hx-boost="true"
-                    href="{{ url_for('security.register') }}">
-                    <button class="btn btn-primary btn-lg">Get Started</button>
-                </a>
-            </hgroup>
-        </main>
-    </body>
+<body class="min-h-screen bg-base-100 font-sans">
+
+  {# ── Minimal nav ── #}
+  <header class="flex justify-end p-4">
+    {% include 'components/theme_toggle_inline.html' %}
+  </header>
+
+  {# ── Hero ── #}
+  <section class="hero min-h-[80vh]">
+    <div class="hero-content text-center max-w-2xl flex-col gap-8">
+
+      {% if variant == "a" %}
+        {# TODO: Customize variant A headline for your campaign #}
+        <h1 class="text-5xl font-bold">{{ config['APP_NAME'] }}</h1>
+        <p class="text-xl text-base-content/70">Find out how much you could save in just 2 minutes.</p>
+      {% else %}
+        {# TODO: Customize variant B headline for your campaign #}
+        <h1 class="text-5xl font-bold">Stop Overpaying. Start Saving.</h1>
+        <p class="text-xl text-base-content/70">Answer 3 quick questions and get your personalized analysis — free.</p>
+      {% endif %}
+
+      {# Funnel entry point — HTMX loads first step inline #}
+      <div id="funnel-container">
+        <button
+          class="btn btn-primary btn-lg"
+          hx-get="/funnel/step/1"
+          hx-target="#funnel-container"
+          hx-swap="outerHTML"
+          hx-indicator="#loading">
+          Get Started →
+        </button>
+        <span id="loading" class="htmx-indicator loading loading-spinner loading-md ml-3"></span>
+      </div>
+
+    </div>
+  </section>
+
+  {# ── Social proof / value props (TODO: customize) ── #}
+  <section class="py-16 px-4 max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+      <div class="p-6">
+        <div class="text-4xl mb-3">⚡</div>
+        <h3 class="font-bold text-lg mb-2">Takes 2 minutes</h3>
+        <p class="text-base-content/60">Just 3 quick questions, then your results.</p>
+      </div>
+      <div class="p-6">
+        <div class="text-4xl mb-3">🔒</div>
+        <h3 class="font-bold text-lg mb-2">100% confidential</h3>
+        <p class="text-base-content/60">Your data is never shared or sold.</p>
+      </div>
+      <div class="p-6">
+        <div class="text-4xl mb-3">🎯</div>
+        <h3 class="font-bold text-lg mb-2">Personalized results</h3>
+        <p class="text-base-content/60">Tailored to your specific situation.</p>
+      </div>
+    </div>
+  </section>
+
+</body>
 {% endblock %}

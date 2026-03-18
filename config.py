@@ -12,7 +12,10 @@ class BaseConfig:
 
     LOG_TO_STDOUT = os.environ.get("LOG_TO_STDOUT")
     SERVER_NAME = os.getenv("HOST_NAME")
-    SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT")
+    # Campaign / funnel config
+    LEAD_EMAIL_SUBJECT = os.getenv("LEAD_EMAIL_SUBJECT", "Thanks for your interest!")
+    MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", "noreply@example.com")
+    AB_VARIANT = os.getenv("AB_VARIANT", "a")  # "a" or "b" — controls landing page variant
 
 
 class DevelopmentConfig(BaseConfig):
